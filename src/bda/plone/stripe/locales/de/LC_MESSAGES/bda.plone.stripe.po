@@ -17,39 +17,39 @@ msgstr ""
 #. Default: "Enter credit card information"
 #: ./checkout.pt:20
 msgid "credit_card_information"
-msgstr ""
+msgstr "Bitte geben Sie Ihre Kreditkarteninformation ein"
 
 #. Default: "continue"
 #: ./failed.pt:36
 #: ./success.pt:27
 msgid "payment_done"
-msgstr ""
+msgstr "weiter"
 
 #. Default: "Stripe Payment"
 #: ./__init__.py:26
 msgid "stripe_payment"
-msgstr ""
+msgstr "Stripe Payment"
 
 #. Default: "Payment Failed"
 #: ./failed.pt:20
 msgid "stripe_payment_failed"
-msgstr ""
+msgstr "Zahlung fehlgeschlagen"
 
 #. Default: "If you have questions, please contact"
 #: ./failed.pt:28
 msgid "stripe_payment_failed_questions"
-msgstr ""
+msgstr "Wenn Sie Fragen haben, bitte kontaktieren Sie"
 
 #. Default: "Payment Success"
 #: ./success.pt:20
 msgid "stripe_payment_success"
-msgstr ""
+msgstr "Bestellung erfolgreich abgeschlossen"
 
 #. Default: "Your Order has been completed successful."
 #: ./success.pt:23
 msgid "stripe_payment_success_text"
-msgstr ""
+msgstr "Ihre Bestellung wurde erfolgreich abgeschlossen."
 
 #: ./failed.pt:31
 msgid "us"
-msgstr ""
+msgstr "uns"

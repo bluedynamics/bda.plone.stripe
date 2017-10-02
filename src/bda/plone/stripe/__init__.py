@@ -1,8 +1,8 @@
-from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from bda.plone.payment import Payment
 from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
+from bda.plone.shop.utils import get_shop_settings
 from zExceptions import Redirect
 from zope.i18nmessageid import MessageFactory
 import logging
@@ -150,8 +150,4 @@ class StripePaymentFailed(BrowserView):
 
     @property
     def shopmaster_mail(self):
-        # XXX: use from shop panel
-        # XXX: fix in six payment
-        #props = getToolByName(self.context, 'portal_properties')
-        #return props.site_properties.email_from_address
-        return 'foo@example.com'
+        return get_shop_settings().admin_email
