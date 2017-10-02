@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:browser="http://namespaces.zope.org/browser">
+
+  <adapter name="stripe_payment" factory=".StripePayment" />
+
+</configure>
