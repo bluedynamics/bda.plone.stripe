@@ -1,0 +1,5 @@
+*.pyc
+src/bda.plone.stripe.egg-info/
+*.mo
+dist/
+node_modules

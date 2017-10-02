@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="bda.plone.stripe">
+
+<head>
+  <metal:top fill-slot="top_slot">
+    <tal:border define="dummy python:request.set('disable_border', True)" />
+  </metal:top>
+</head>
+
+<body>
+
+<metal:main fill-slot="main">
+  <tal:main-macro metal:define-macro="main">
+
+    <h1 class="documentFirstHeading" i18n:translate="credit_card_information">
+      Enter credit card information
+    </h1>
+
+    <form action="${context/absolute_url}/stripe_charge" method="post" id="payment-form">
+      <div class="form-row">
+        <div id="card-element"></div>
+        <div id="card-errors" role="alert"></div>
+      </div>
+      <button style="margin-top: 1em;">Submit Payment</button>
+    </form>
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script tal:content="view/checkout_settings">
+      var stripe_api_key = 'pk_test_6pRNASCoBOKtIshFeQd4XMUh';
+      var order_uid = '46052806-79cc-4201-8e1b-3f0d1a6ed5fe';
+    </script>
+
+    <script>
+      var stripe = Stripe(stripe_api_key);
+      var elements = stripe.elements();
+
+      // Custom styling can be passed to options when creating an Element.
+      var style = {
+        base: {
+          // Add your base input styles here. For example:
+          fontSize: '16px',
+          lineHeight: '24px'
+        }
+      };
+
+      // Create an instance of the card Element
+      var card = elements.create('card', {style: style});
+
+      // Add an instance of the card Element into the `card-element` div
+      card.mount('#card-element');
+
+      card.addEventListener('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+          displayError.textContent = event.error.message;
+        } else {
+          displayError.textContent = '';
+        }
+      });
+
+      // Create a token or display an error when the form is submitted.
+      var form = document.getElementById('payment-form');
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        stripe.createToken(card).then(function(result) {
+          if (result.error) {
+            // Inform the user if there was an error
+            var errorElement = document.getElementById('card-errors');
+            errorElement.textContent = result.error.message;
+          } else {
+            // Send the token to your server
+            stripeTokenHandler(result.token);
+          }
+        });
+      });
+
+      function stripeTokenHandler(token) {
+        var form = document.getElementById('payment-form');
+
+        // Insert the order UID into the form
+        var uid = document.createElement('input');
+        uid.setAttribute('type', 'hidden');
+        uid.setAttribute('name', 'uid');
+        uid.setAttribute('value', order_uid);
+        form.appendChild(uid);
+
+        // Insert the token ID into the form
+        var tokenId = document.createElement('input');
+        tokenId.setAttribute('type', 'hidden');
+        tokenId.setAttribute('name', 'stripeToken');
+        tokenId.setAttribute('value', token.id);
+        form.appendChild(tokenId);
+
+        // Submit the form
+        form.submit();
+      }
+    </script>
+
+  </tal:main-macro>
+</metal:main>
+
+</body>
+</html>

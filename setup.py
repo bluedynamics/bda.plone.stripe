@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'setuptools',
         'bda.plone.shop',
+        'stripe',
     ],
     extras_require={
         'test': [

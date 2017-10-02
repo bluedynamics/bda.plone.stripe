@@ -1,6 +1,44 @@
 <configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
            xmlns:browser="http://namespaces.zope.org/browser">
 
+  <!-- Generic setup -->
+  <include package="Products.GenericSetup" file="meta.zcml" />
+
+  <genericsetup:registerProfile
+    name="default"
+    title="bda.plone.stripe"
+    directory="profile"
+    description="Stripe payment integration"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <!-- Payment -->
   <adapter name="stripe_payment" factory=".StripePayment" />
+
+  <browser:page
+    for="*"
+    name="stripe_payment"
+    class=".StripePaymentCheckout"
+    template="checkout.pt"
+    permission="zope2.View" />
+
+  <browser:page
+    for="*"
+    name="stripe_charge"
+    class=".StripePaymentCharge"
+    permission="zope2.View" />
+
+  <browser:page
+    for="*"
+    name="stripe_payment_success"
+    template="success.pt"
+    permission="zope2.View" />
+
+  <browser:page
+    for="*"
+    name="stripe_payment_failed"
+    template="failed.pt"
+    class=".StripePaymentFailed"
+    permission="zope2.View" />
 
 </configure>
