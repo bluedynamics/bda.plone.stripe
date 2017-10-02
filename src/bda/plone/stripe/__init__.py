@@ -9,6 +9,7 @@ import logging
 import stripe
 import sys
 import traceback
+import transaction
 
 
 logger = logging.getLogger('bda.plone.stripe')
@@ -82,13 +83,15 @@ class StripePaymentCharge(BrowserView, StripeSettings):
             )
             evt_data = {
                 'charge_id': charge['id'],
-                'balance_transaction': charge['balance_transaction'],
-                'customer': charge['customer'],
-                'invoice': charge['invoice'],
             }
             payment.succeed(self.request, order_uid, evt_data)
+            transaction.commit()
             redirect_url = '{}/@@stripe_payment_success'.format(base_url)
             raise Redirect(redirect_url)
+        except Redirect as e:
+            # simply re-raise error from above, otherwise it would get
+            # caught in generel Exception catching block
+            raise e
         except stripe.error.CardError as e:
             logger.error(format_traceback())
             body = e.json_body
@@ -129,11 +132,9 @@ class StripePaymentCharge(BrowserView, StripeSettings):
             message = 'General error'
         evt_data = {
             'charge_id': 'none',
-            'balance_transaction': 'none',
-            'customer': 'none',
-            'invoice': 'none',
         }
         payment.failed(self.request, order_uid, evt_data)
+        transaction.commit()
         redirect_url = '{}/@@stripe_payment_failed?message={}'.format(
             base_url,
             message
@@ -149,5 +150,8 @@ class StripePaymentFailed(BrowserView):
 
     @property
     def shopmaster_mail(self):
-        props = getToolByName(context, 'portal_properties')
-        return props.site_properties.email_from_address
+        # XXX: use from shop panel
+        # XXX: fix in six payment
+        #props = getToolByName(self.context, 'portal_properties')
+        #return props.site_properties.email_from_address
+        return 'foo@example.com'
