@@ -1,10 +1,14 @@
 from Products.Five import BrowserView
+from bda.plone.cart.browser.portlet import SKIP_RENDER_CART_PATTERNS
 from bda.plone.payment import Payment
 from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
 from bda.plone.shop.utils import get_shop_settings
+from plone.registry.interfaces import IRegistry
 from zExceptions import Redirect
+from zope.component import getUtility
 from zope.i18nmessageid import MessageFactory
+import interfaces
 import logging
 import stripe
 import sys
@@ -16,9 +20,18 @@ logger = logging.getLogger('bda.plone.stripe')
 _ = MessageFactory('bda.plone.stripe')
 
 
+SKIP_RENDER_CART_PATTERNS.append('@@stripe_payment')
+SKIP_RENDER_CART_PATTERNS.append('@@stripe_payment_success')
+SKIP_RENDER_CART_PATTERNS.append('@@stripe_payment_failed')
+
+
 def format_traceback():
     etype, value, tb = sys.exc_info()
     return ''.join(traceback.format_exception(etype, value, tb))
+
+
+def get_stripe_settings():
+    return getUtility(IRegistry).forInterface(interfaces.IStripeSettings)
 
 
 class StripePayment(Payment):
@@ -33,11 +46,11 @@ class StripeSettings(object):
 
     @property
     def secret_key(self):
-        return 'sk_test_BQokikJOvBiI2HlWgH4olfQ2'
+        return get_stripe_settings().secret_key
 
     @property
     def publishable_key(self):
-        return 'pk_test_6pRNASCoBOKtIshFeQd4XMUh'
+        return get_stripe_settings().publishable_key
 
 
 CHECKOUT_SETTINGS = """
@@ -70,7 +83,6 @@ class StripePaymentCharge(BrowserView, StripeSettings):
             currency = data['currency']
             description = data['description']
             ordernumber = data['ordernumber']
-            successlink = '{}/@@stripe_payment_success'.format(base_url)
             charge = stripe.Charge.create(
                 amount=amount,
                 currency=currency,

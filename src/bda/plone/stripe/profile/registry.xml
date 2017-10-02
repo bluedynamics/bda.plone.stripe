@@ -2,4 +2,9 @@
 <registry xmlns:i18n="http://xml.zope.org/namespaces/i18n"
           i18n:domain="bda.plone.stripe">
 
+  <records interface="bda.plone.stripe.interfaces.IStripeSettings">
+    <value key="secret_key" purge="false">sk_test_BQokikJOvBiI2HlWgH4olfQ2</value>
+    <value key="publishable_key" purge="false">pk_test_6pRNASCoBOKtIshFeQd4XMUh</value>
+  </records>
+
 </registry>

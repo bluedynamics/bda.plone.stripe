@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2017-10-02 11:18+0000\n"
+"POT-Creation-Date: 2017-10-02 12:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,9 +14,24 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
+#. Default: "Stripe"
+#: ./interfaces.py:18
+msgid "Stripe"
+msgstr ""
+
 #. Default: "Enter credit card information"
 #: ./checkout.pt:20
 msgid "credit_card_information"
+msgstr ""
+
+#. Default: "Stripe publishable key"
+#: ./interfaces.py:32
+msgid "label_publishable_key"
+msgstr ""
+
+#. Default: "Stripe secret key"
+#: ./interfaces.py:26
+msgid "label_secret_key"
 msgstr ""
 
 #. Default: "continue"
@@ -26,7 +41,7 @@ msgid "payment_done"
 msgstr ""
 
 #. Default: "Stripe Payment"
-#: ./__init__.py:26
+#: ./__init__.py:39
 msgid "stripe_payment"
 msgstr ""
 
