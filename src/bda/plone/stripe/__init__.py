@@ -5,6 +5,7 @@ from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
 from bda.plone.shop.utils import get_shop_settings
 from plone.registry.interfaces import IRegistry
+from plone import api
 from zExceptions import Redirect
 from zope.component import getUtility
 from zope.i18nmessageid import MessageFactory
@@ -76,9 +77,11 @@ class StripePaymentCharge(BrowserView, StripeSettings):
         base_url = self.context.absolute_url()
         token = self.request['stripeToken']
         order_uid = self.request['uid']
+        locale = api.portal.get_current_language(self.context)
         payment = Payments(self.context).get('stripe_payment')
         try:
             data = IPaymentData(self.context).data(order_uid)
+            locale = locale
             amount = data['amount']
             currency = data['currency']
             description = data['description']
