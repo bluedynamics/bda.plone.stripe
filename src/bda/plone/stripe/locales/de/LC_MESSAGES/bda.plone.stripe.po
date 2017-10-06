@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2017-10-02 12:23+0000\n"
+"POT-Creation-Date: 2017-10-06 11:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,15 +14,32 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
+#: ./checkout.pt:144
+msgid "CVC"
+msgstr "CVC"
+
+#: ./checkout.pt:140
+msgid "Expiry date"
+msgstr "Gültig bis"
+
+#: ./checkout.pt:152
+msgid "Name"
+msgstr "Name"
+
 #. Default: "Stripe"
 #: ./interfaces.py:18
 msgid "Stripe"
 msgstr "Stripe"
 
 #. Default: "Enter credit card information"
-#: ./checkout.pt:20
+#: ./checkout.pt:129
 msgid "credit_card_information"
-msgstr "Bitte geben Sie Ihre Kreditkarteninformation ein"
+msgstr "Kreditkarteninformationen"
+
+#. Default: "Card number"
+#: ./checkout.pt:136
+msgid "label_card_number"
+msgstr "Kartennummer"
 
 #. Default: "Stripe publishable key"
 #: ./interfaces.py:32
@@ -34,6 +51,11 @@ msgstr "Stripe öffentlicher Schlüssel"
 msgid "label_secret_key"
 msgstr "Stripe privater Schlüssel"
 
+#. Default: "Pay now"
+#: ./checkout.pt:159
+msgid "pay_now"
+msgstr "Jetzt bezahlen"
+
 #. Default: "continue"
 #: ./failed.pt:36
 #: ./success.pt:27
@@ -41,7 +63,7 @@ msgid "payment_done"
 msgstr "weiter"
 
 #. Default: "Stripe Payment"
-#: ./__init__.py:39
+#: ./__init__.py:40
 msgid "stripe_payment"
 msgstr "Stripe Payment"
 

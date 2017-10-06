@@ -133,24 +133,24 @@
     <form action="${context/absolute_url}/stripe_charge" method="post" id="payment-form">
       <div class="group">
         <label>
-          <span>Card number</span>
+          <span i18n:translate="label_card_number">Card number</span>
           <div id="card-number-element" class="field"></div>
         </label>
         <label>
-          <span>Expiry date</span>
+          <span i18n:translate="">Expiry date</span>
           <div id="card-expiry-element" class="field"></div>
         </label>
         <label>
-          <span>CVC</span>
+          <span i18n:translate="">CVC</span>
           <div id="card-cvc-element" class="field"></div>
         </label>
-        <label>
+        <!-- <label>
           <span>Postal code</span>
           <div id="postal-code-element" class="field"></div>
-        </label>
+        </label> -->
         <label>
-          <span>Name</span>
-          <input id="card-holder-name" class="field" type="text"
+          <span i18n:translate="">Name</span>
+          <input id="card-holder-name" class="field InputElement" type="text"
                  name="card-holder-name" placeholder="Card holder name"
                  value="" />
         </label>
@@ -173,7 +173,7 @@
           card_number: {},
           card_expiry: {},
           card_cvc: {},
-          postal_code: {},
+          // postal_code: {},
           card_holder: {}
       }
 
@@ -190,9 +190,9 @@
         if (card_state.card_cvc.error) {
           errors.push(card_state.card_cvc.error.message);
         }
-        if (card_state.postal_code.error) {
-          errors.push(card_state.postal_code.error.message);
-        }
+        // if (card_state.postal_code.error) {
+        //   errors.push(card_state.postal_code.error.message);
+        // }
         if (card_state.card_holder.error) {
           errors.push(card_state.card_holder.error.message);
         }
@@ -211,7 +211,7 @@
         if (card_state.card_number.complete &&
             card_state.card_expiry.complete &&
             card_state.card_cvc.complete &&
-            card_state.postal_code.complete &&
+            // card_state.postal_code.complete &&
             card_state.card_holder.complete) {
           return true;
         } else {
@@ -253,12 +253,12 @@
         display_errors();
       });
 
-      var postal_code = elements.create('postalCode', {style: style});
-      postal_code.mount('#postal-code-element');
-      postal_code.on('change', function(event) {
-        card_state.postal_code = event;
-        display_errors();
-      });
+      // var postal_code = elements.create('postalCode', {style: style});
+      // postal_code.mount('#postal-code-element');
+      // postal_code.on('change', function(event) {
+      //   card_state.postal_code = event;
+      //   display_errors();
+      // });
 
       var card_holder = $('#card-holder-name');
       card_holder.on('change', function(event) {
