@@ -41,3 +41,4 @@ Contributors
 ============
 
 - Robert Niederreiter (Author)
+- Peter Holzer (Development)
