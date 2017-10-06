@@ -72,7 +72,8 @@
       line-height: 40px;
       font-weight: 300;
       font-family: sans-serif;
-      font-size: 15px;
+      font-size: 15.5px;
+      letter-spacing: -0.01em;
       border: none;
       box-shadow: none;
     }
