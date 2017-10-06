@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2017-10-06 11:14+0000\n"
+"POT-Creation-Date: 2017-10-06 13:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,32 +14,35 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: ./checkout.pt:144
-msgid "CVC"
-msgstr "CVC"
-
-#: ./checkout.pt:140
-msgid "Expiry date"
-msgstr "Gültig bis"
-
-#: ./checkout.pt:152
-msgid "Name"
-msgstr "Name"
-
 #. Default: "Stripe"
 #: ./interfaces.py:18
 msgid "Stripe"
 msgstr "Stripe"
 
 #. Default: "Enter credit card information"
-#: ./checkout.pt:129
+#: ./checkout.pt:119
 msgid "credit_card_information"
 msgstr "Kreditkarteninformationen"
 
 #. Default: "Card number"
-#: ./checkout.pt:136
+#: ./checkout.pt:126
 msgid "label_card_number"
 msgstr "Kartennummer"
+
+#. Default: "CVC"
+#: ./checkout.pt:134
+msgid "label_cvc"
+msgstr "CVC"
+
+#. Default: "Expiry date"
+#: ./checkout.pt:130
+msgid "label_expiry_date"
+msgstr "Gültig bis"
+
+#. Default: "Name"
+#: ./checkout.pt:142
+msgid "label_name"
+msgstr "Name"
 
 #. Default: "Stripe publishable key"
 #: ./interfaces.py:32
@@ -51,8 +54,13 @@ msgstr "Stripe öffentlicher Schlüssel"
 msgid "label_secret_key"
 msgstr "Stripe privater Schlüssel"
 
+#. Default: "Card holder name"
+#: ./checkout.pt:143
+msgid "name_placeholder"
+msgstr "Karteninhaber"
+
 #. Default: "Pay now"
-#: ./checkout.pt:159
+#: ./checkout.pt:150
 msgid "pay_now"
 msgstr "Jetzt bezahlen"
 

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2017-10-06 11:14+0000\n"
+"POT-Creation-Date: 2017-10-06 13:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,34 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: bda.plone.stripe\n"
 
-#: ./checkout.pt:144
-msgid "CVC"
-msgstr ""
-
-#: ./checkout.pt:140
-msgid "Expiry date"
-msgstr ""
-
-#: ./checkout.pt:152
-msgid "Name"
-msgstr ""
-
 #. Default: "Stripe"
 #: ./interfaces.py:18
 msgid "Stripe"
 msgstr ""
 
 #. Default: "Enter credit card information"
-#: ./checkout.pt:129
+#: ./checkout.pt:119
 msgid "credit_card_information"
 msgstr ""
 
 #. Default: "Card number"
-#: ./checkout.pt:136
+#: ./checkout.pt:126
 msgid "label_card_number"
+msgstr ""
+
+#. Default: "CVC"
+#: ./checkout.pt:134
+msgid "label_cvc"
+msgstr ""
+
+#. Default: "Expiry date"
+#: ./checkout.pt:130
+msgid "label_expiry_date"
+msgstr ""
+
+#. Default: "Name"
+#: ./checkout.pt:142
+msgid "label_name"
 msgstr ""
 
 #. Default: "Stripe publishable key"
@@ -54,8 +57,13 @@ msgstr ""
 msgid "label_secret_key"
 msgstr ""
 
+#. Default: "Card holder name"
+#: ./checkout.pt:143
+msgid "name_placeholder"
+msgstr ""
+
 #. Default: "Pay now"
-#: ./checkout.pt:159
+#: ./checkout.pt:150
 msgid "pay_now"
 msgstr ""
 
