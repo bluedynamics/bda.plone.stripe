@@ -98,7 +98,8 @@ class StripePaymentCharge(BrowserView, StripeSettings):
             }
             payment.succeed(self.request, order_uid, evt_data)
             transaction.commit()
-            redirect_url = '{}/@@stripe_payment_success'.format(base_url)
+            redirect_url = '{base_url}/@@stripe_payment_success?uid={order_uid}'.format(
+                base_url=base_url, order_uid=order_uid)
             raise Redirect(redirect_url)
         except Redirect as e:
             # simply re-raise error from above, otherwise it would get
