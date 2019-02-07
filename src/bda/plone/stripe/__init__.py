@@ -8,7 +8,7 @@ from plone.registry.interfaces import IRegistry
 from zExceptions import Redirect
 from zope.component import getUtility
 from zope.i18nmessageid import MessageFactory
-import interfaces
+from bda.plone.stripe import interfaces
 import logging
 import stripe
 import sys
