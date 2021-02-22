@@ -1,5 +1,6 @@
 from Products.Five import BrowserView
 from bda.plone.cart.browser.portlet import SKIP_RENDER_CART_PATTERNS
+from bda.plone.cart.cartitem import purge_cart
 from bda.plone.payment import Payment
 from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
@@ -37,6 +38,7 @@ def get_stripe_settings():
 class StripePayment(Payment):
     pid = 'stripe_payment'
     label = _('stripe_payment', 'Stripe Payment')
+    clear_session = False
 
     def init_url(self, uid):
         return '%s/@@stripe_payment?uid=%s' % (self.context.absolute_url(), uid)
@@ -97,10 +99,11 @@ class StripePaymentCharge(BrowserView, StripeSettings):
                 'charge_id': charge['id'],
             }
             payment.succeed(self.request, order_uid, evt_data)
+            purge_cart(self.request)
             transaction.commit()
             redirect_url = '{base_url}/@@stripe_payment_success?uid={order_uid}'.format(
                 base_url=base_url, order_uid=order_uid)
-            raise Redirect(redirect_url)
+            return self.request.response.redirect(redirect_url)
         except Redirect as e:
             # simply re-raise error from above, otherwise it would get
             # caught in generel Exception catching block
