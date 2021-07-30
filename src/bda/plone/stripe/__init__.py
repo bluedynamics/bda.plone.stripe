@@ -74,12 +74,16 @@ class StripePaymentCheckout(BrowserView, StripeSettings):
 class StripePaymentCharge(BrowserView, StripeSettings):
 
     def __call__(self):
+        logger.info(self.request.items())
         stripe.api_key = self.secret_key
         base_url = self.context.absolute_url()
         token = self.request['stripeToken']
         order_uid = self.request['uid']
         payment = Payments(self.context).get('stripe_payment')
+        logger.info(f"stripe_init: order_uid {order_uid}")
+
         try:
+            # breakpoint()
             data = IPaymentData(self.context).data(order_uid)
             amount = data['amount']
             currency = data['currency']
@@ -98,6 +102,8 @@ class StripePaymentCharge(BrowserView, StripeSettings):
             evt_data = {
                 'charge_id': charge['id'],
             }
+            # breakpoint()
+            # logger.info(charge)
             payment.succeed(self.request, order_uid, evt_data)
             purge_cart(self.request)
             transaction.commit()
