@@ -1,6 +1,5 @@
 from Products.Five import BrowserView
 from bda.plone.cart.browser.portlet import SKIP_RENDER_CART_PATTERNS
-from bda.plone.cart.cartitem import purge_cart
 from bda.plone.payment import Payment
 from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
@@ -9,13 +8,15 @@ from plone.registry.interfaces import IRegistry
 from zExceptions import Redirect
 from zope.component import getUtility
 from zope.i18nmessageid import MessageFactory
-from bda.plone.stripe import interfaces
+from plone import api
+import interfaces
 import logging
 import stripe
 import sys
 import traceback
 import transaction
-
+import ast
+import json
 
 logger = logging.getLogger('bda.plone.stripe')
 _ = MessageFactory('bda.plone.stripe')
@@ -38,7 +39,6 @@ def get_stripe_settings():
 class StripePayment(Payment):
     pid = 'stripe_payment'
     label = _('stripe_payment', 'Stripe Payment')
-    clear_session = False
 
     def init_url(self, uid):
         return '%s/@@stripe_payment?uid=%s' % (self.context.absolute_url(), uid)
@@ -58,6 +58,7 @@ class StripeSettings(object):
 CHECKOUT_SETTINGS = """
     var stripe_api_key = '{api_key}';
     var order_uid = '{order_uid}';
+    var lang = '{lang}';
 """
 
 
@@ -67,95 +68,83 @@ class StripePaymentCheckout(BrowserView, StripeSettings):
     def checkout_settings(self):
         return CHECKOUT_SETTINGS.format(
             api_key=self.publishable_key,
-            order_uid=self.request['uid']
+            order_uid=self.request['uid'],
+            lang=api.portal.get_current_language()
         )
 
 
 class StripePaymentCharge(BrowserView, StripeSettings):
+    def generate_response(self, intent):
+        status = intent['status']
+        if status == 'requires_action' or status == 'requires_source_action':
+            # Card requires authentication
+            json_object = json.dumps({'requiresAction': True, 'paymentIntentId': intent['id'], 'clientSecret': intent['client_secret'], 'status': 'requires_action'})
+            return json_object
+        elif status == 'requires_payment_method' or status == 'requires_source':
+            # Card was not properly authenticated, suggest a new payment method
+            json_object = json.dumps({'error': 'Your card was denied, please provide a new payment method', 'status': 'error'})
+            return json_object
+        elif status == 'succeeded':
+            # Payment is complete, authentication not required
+            # To cancel the payment you will need to issue a Refund (https://stripe.com/docs/api/refunds)
+            print("Payment received!")
+            json_object = json.dumps({'clientSecret': intent['client_secret'], 'status': 'succeeded'})
+            return json_object
 
     def __call__(self):
-        stripe.api_key = self.secret_key
-        base_url = self.context.absolute_url()
-        token = self.request['stripeToken']
-        order_uid = self.request['uid']
-        payment = Payments(self.context).get('stripe_payment')
+        data = self.request.get('BODY')
+        app = self.context.restrictedTraverse('/')  # Zope application server root
+        site = app["Plone"]  # your plone instance
+        base_url = site.absolute_url()
+        payment = Payments(site).get('stripe_payment')
         try:
-            data = IPaymentData(self.context).data(order_uid)
-            amount = data['amount']
-            currency = data['currency']
-            description = data['description']
-            ordernumber = data['ordernumber']
-            charge = stripe.Charge.create(
-                amount=amount,
-                currency=currency,
-                description=description,
-                source=token,
-                metadata={
-                    'ordernumber': ordernumber,
-                    'order_uid': order_uid
-                }
-            )
-            evt_data = {
-                'charge_id': charge['id'],
-            }
-            payment.succeed(self.request, order_uid, evt_data)
-            purge_cart(self.request)
-            transaction.commit()
-            redirect_url = '{base_url}/@@stripe_payment_success?uid={order_uid}'.format(
-                base_url=base_url, order_uid=order_uid)
-            return self.request.response.redirect(redirect_url)
-        except Redirect as e:
-            # simply re-raise error from above, otherwise it would get
-            # caught in generel Exception catching block
-            raise e
+            data = ast.literal_eval(data)
         except stripe.error.CardError as e:
-            logger.error(format_traceback())
-            body = e.json_body
-            err = body.get('error', {})
-            logger.error((
-                'Failed to charge card\n'
-                '    Status: {}\n'
-                '    Type: {}\n'
-                '    Code: {}\n'
-                '    Message: {}'
-            ).format(
-                e.http_status,
-                err.get('type'),
-                err.get('code'),
-                err.get('message')
-            ))
-            if not err.get('message'):
-                message = 'Failed to charge card'
+            return {'error': e.user_message}
+        try:
+            stripe.api_key = self.secret_key
+            infodata = IPaymentData(site).data(data['order_uid'])
+            if 'payment_method_id' in data:
+                # Create new PaymentIntent with a PaymentMethod ID from the client.
+                intent = stripe.PaymentIntent.create(
+                    amount=infodata['amount'],
+                    currency=infodata['currency'],
+                    description=infodata['description'],
+                    payment_method=data['payment_method_id'],
+                    confirmation_method='manual',
+                    confirm=True,
+                    # If a mobile client passes `useStripeSdk`, set `use_stripe_sdk=true`
+                    # to take advantage of new authentication features in mobile SDKs.
+                    use_stripe_sdk=True if 'useStripeSdk' in data and data['useStripeSdk'] else None,
+                )
+                # After create, if the PaymentIntent's status is succeeded, fulfill the order.
+            elif 'payment_intent_id' in data:
+                # Confirm the PaymentIntent to finalize payment after handling a required action
+                # on the client.
+                intent = stripe.PaymentIntent.confirm(data['payment_intent_id'])
+                # After confirm, if the PaymentIntent's status is succeeded, fulfill the order.
+            intent_resp = self.generate_response(intent)
+            try:
+                intent_resp_data = json.loads(intent_resp)
+            except:
+                intent_resp_data = intent_resp
+            if intent_resp_data['status'] == 'succeeded':
+                evt_data = {
+                    'charge_id': intent.id,
+                }
+                payment.succeed(self.request, data['order_uid'], evt_data)
+                transaction.commit()
+            elif intent_resp_data['status'] == 'error':
+                evt_data = {
+                    'charge_id': 'none',
+                }
+                payment.failed(self.request, data['order_uid'], evt_data)
+                transaction.commit()
             else:
-                message = err['message']
-        except stripe.error.RateLimitError as e:
-            logger.error(format_traceback())
-            message = 'Too many requests made to the API too quickly'
-        except stripe.error.InvalidRequestError as e:
-            logger.error(format_traceback())
-            message = 'Invalid parameters were supplied to Stripe\'s API'
-        except stripe.error.AuthenticationError as e:
-            logger.error(format_traceback())
-            message = 'Authentication with Stripe\'s API failed'
-        except stripe.error.APIConnectionError as e:
-            logger.error(format_traceback())
-            message = 'Network communication with Stripe failed'
-        except stripe.error.StripeError as e:
-            logger.error(format_traceback())
-            message = 'Generic stripe error'
-        except Exception as e:
-            logger.error(format_traceback())
-            message = 'General error'
-        evt_data = {
-            'charge_id': 'none',
-        }
-        payment.failed(self.request, order_uid, evt_data)
-        transaction.commit()
-        redirect_url = '{}/@@stripe_payment_failed?message={}'.format(
-            base_url,
-            message
-        )
-        raise Redirect(redirect_url)
+                pass
+            return intent_resp
+        except stripe.error.CardError as e:
+            return {'error': e.user_message}
 
 
 class StripePaymentFailed(BrowserView):
