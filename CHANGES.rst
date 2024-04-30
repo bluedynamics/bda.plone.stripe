@@ -1,8 +1,8 @@
+Changes
+=======
 
-Changelog
-=========
+1.0 (2024-04-30)
+----------------
 
-0.1.dev0
---------
+- Initial work.
 
-- Initial
