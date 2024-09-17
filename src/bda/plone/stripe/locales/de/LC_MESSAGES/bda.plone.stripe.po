@@ -14,6 +14,11 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
+#. Default: "order for a fee"
+#: ./checkout.pt:66
+msgid "bezahlen"
+msgstr "Kostenpflichtig bestellen"
+
 #. Default: "Stripe"
 #: ./interfaces.py:18
 msgid "Stripe"

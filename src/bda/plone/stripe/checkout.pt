@@ -17,95 +17,31 @@
       margin: 20px 0;
     }
 
-    .group {
-      background: white;
-      box-shadow: 0 7px 14px 0 rgba(49, 49, 93, 0.10), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
-      border-radius: 4px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      position: relative;
-      color: #8898AA;
-      font-weight: 300;
+    .StripeElement {
       height: 40px;
-      line-height: 40px;
-      margin-left: 20px;
-      display: flex;
-      flex-direction: row;
-    }
-
-    .group label:not(:last-child) {
-      border-bottom: 1px solid #F0F5FA;
-    }
-
-    label > span {
-      width: 120px;
-      text-align: right;
-      margin-right: 30px;
-    }
-
-    .field {
-      background: transparent;
-      font-weight: 300;
-      border: 0;
-      color: #31325F;
-      outline: none;
-      flex: 1;
-      padding-right: 10px;
-      padding-left: 10px;
-      cursor: text;
-    }
-
-    .field::-webkit-input-placeholder {
-      color: #CFD7E0;
-    }
-
-    .field::-moz-placeholder {
-      color: #CFD7E0;
-    }
-
-    #card-holder-name {
-      color: #000;
-      height: 40px;
-      padding: 6px 10px;
-      line-height: 40px;
-      font-weight: 300;
-      font-family: sans-serif;
-      font-size: 15.5px;
-      letter-spacing: -0.01em;
-      border: none;
-      box-shadow: none;
-    }
-    #card-holder-name::-webkit-input-placeholder {
-      color: #CFD7E0;
-    }
-    #card-holder-name::-moz-placeholder {
-      color: #CFD7E0;
-    }
-
-    button[type="submit"] {
-      display: block;
-      box-shadow: 0 7px 14px 0 rgba(49, 49, 93, 0.10), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
+      padding: 10px 12px;
+      width: 100%;
+      color: #32325d;
+      background-color: white;
+      border: 1px solid transparent;
       border-radius: 4px;
-      /*border: 0;*/
-      margin: 0 auto 2em auto;
-      /*font-size: 15px;*/
-      /*font-weight: 400;*/
-      /*width: 100%;*/
-      /*height: 40px;*/
-      /*line-height: 38px;*/
-      outline: none;
+
+      box-shadow: 0 1px 3px 0 #e6ebf1;
+      -webkit-transition: box-shadow 150ms ease;
+      transition: box-shadow 150ms ease;
     }
 
-    .card-errors {
-      display: none;
-      box-shadow: 0 7px 14px 0 rgba(49, 49, 93, 0.10), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
-      color: #E4584C;
-      border: 1px solid #F0F5FA;
-      margin-top: 10px;
-      margin-bottom: 10px;
+    .StripeElement--focus {
+      box-shadow: 0 1px 3px 0 #cfd7df;
     }
+
+    .StripeElement--invalid {
+      border-color: #fa755a;
+    }
+
+    .StripeElement--webkit-autofill {
+      background-color: #fefde5 !important;
+}
 
   </style>
 
@@ -117,200 +53,122 @@
 <metal:main fill-slot="main">
   <tal:main-macro metal:define-macro="main">
 
-  <header>
     <h1 class="documentFirstHeading" i18n:translate="credit_card_information">
       Enter credit card information
     </h1>
-  </header>
-  <div id="content-core" class="d-flex justify-content-center">
-    <form action="${context/absolute_url}/stripe_charge" method="post" id="payment-form" class="ElementsApp">
-      <div class="group">
-        <label>
-          <span i18n:translate="label_card_number">Card number</span>
-          <div id="card-number-element" class="field"></div>
-        </label>
-        <label>
-          <span i18n:translate="label_expiry_date">Expiry date</span>
-          <div id="card-expiry-element" class="field"></div>
-        </label>
-        <label>
-          <span i18n:translate="label_cvc">CVC</span>
-          <div id="card-cvc-element" class="field"></div>
-        </label>
-        <!-- <label>
-          <span>Postal code</span>
-          <div id="postal-code-element" class="field"></div>
-        </label> -->
-        <label>
-          <span i18n:translate="label_name">Name</span>
-          <input id="card-holder-name" class="field InputElement" type="text"
-                 name="card-holder-name" placeholder="Card holder name"
-                 value=""
-                 i18n:attributes="placeholder name_placeholder"/>
-        </label>
-      </div>
-      <div id="card-errors" class="card-errors" role="alert"></div>
-      <button class="btn btn-primary" type="submit" i18n:translate="pay_now">Pay now</button>
+
+    <form id='payment-form'>
+      <label style="min-width: 50%;">
+        Card details
+        <!-- placeholder for Elements -->
+        <div id="card-element"></div>
+      </label>
+      <button type="submit" i18n:translate="bezahlen">Kostenpflichtig bezahlen</button>
     </form>
-  </div>
+
     <script src="https://js.stripe.com/v3/"></script>
 
     <script tal:content="view/checkout_settings">
       var stripe_api_key = 'pk_test_6pRNASCoBOKtIshFeQd4XMUh';
       var order_uid = '46052806-79cc-4201-8e1b-3f0d1a6ed5fe';
+      var lang = '46052806-79cc-4201-8e1b-3f0d1a6ed5fe';
     </script>
 
     <script>
-      var stripe = Stripe(stripe_api_key);
+    window.onload = function() {
+      var stripe = Stripe(stripe_api_key, {
+        locale: lang
+      });
       var elements = stripe.elements();
-      var card_state = {
-          card_number: {},
-          card_expiry: {},
-          card_cvc: {},
-          // postal_code: {},
-          card_holder: {}
-      }
-
-      var error_elem = $('#card-errors');
-      var display_errors = function() {
-        error_elem.empty();
-        var errors = [];
-        if (card_state.card_number.error) {
-          errors.push(card_state.card_number.error.message);
-        }
-        if (card_state.card_expiry.error) {
-          errors.push(card_state.card_expiry.error.message);
-        }
-        if (card_state.card_cvc.error) {
-          errors.push(card_state.card_cvc.error.message);
-        }
-        // if (card_state.postal_code.error) {
-        //   errors.push(card_state.postal_code.error.message);
-        // }
-        if (card_state.card_holder.error) {
-          errors.push(card_state.card_holder.error.message);
-        }
-        if (errors) {
-          var idx;
-          for (idx in errors) {
-            error_elem.append($("<div />").text(errors[idx]));
-            error_elem.show();
-          }
-        } else {
-          error_elem.hide();
-        }
-      };
-
-      var card_complete = function() {
-        if (card_state.card_number.complete &&
-            card_state.card_expiry.complete &&
-            card_state.card_cvc.complete &&
-            // card_state.postal_code.complete &&
-            card_state.card_holder.complete) {
-          return true;
-        } else {
-          return false;
-        }
-      };
-
       var style = {
         base: {
-          iconColor: '#000',
-          color: '#4d4d4d',
-          fontFamily: 'sans-serif',
-          lineHeight: '40px',
-          fontWeight: 300,
-          fontSize: '15px',
-          '::placeholder': {
-            color: '#CFD7E0',
-          },
+          color: "#32325d",
+          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+          fontSmoothing: "antialiased",
+          fontSize: "16px",
+          "::placeholder": {
+            color: "#aab7c4"
+          }
+        },
+        invalid: {
+          color: "#fa755a",
+          iconColor: "#fa755a"
         },
       };
 
-      var card_number = elements.create('cardNumber', {style: style});
-      card_number.mount('#card-number-element');
-      card_number.on('change', function(event) {
-        card_state.card_number = event;
-        display_errors();
-      });
+      var cardElement = elements.create('card', {style: style});
+      cardElement.mount('#card-element');
 
-      var card_expiry = elements.create('cardExpiry', {style: style});
-      card_expiry.mount('#card-expiry-element');
-      card_expiry.on('change', function(event) {
-        card_state.card_expiry = event;
-        display_errors();
-      });
-
-      var card_cvc = elements.create('cardCvc', {style: style});
-      card_cvc.mount('#card-cvc-element');
-      card_cvc.on('change', function(event) {
-        card_state.card_cvc = event;
-        display_errors();
-      });
-
-      // var postal_code = elements.create('postalCode', {style: style});
-      // postal_code.mount('#postal-code-element');
-      // postal_code.on('change', function(event) {
-      //   card_state.postal_code = event;
-      //   display_errors();
-      // });
-
-      var card_holder = $('#card-holder-name');
-      card_holder.on('change', function(event) {
-        var card_holder_state;
-        if ($(this).val().trim()) {
-          card_holder_state = {
-            complete: true
-          };
+      function stripePaymentMethodHandler(result) {
+        if (result.error) {
+          // Show error in payment form
         } else {
-          card_holder_state = {
-            complete: true,
-            error: {
-              message: 'Card holder name is empty'
-            },
-          };
+          // Otherwise send paymentMethod.id to your server (see Step 4)
+          fetch('./stripe_charge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              payment_method_id: result.paymentMethod.id,
+              order_uid: order_uid
+            })
+          }).then(function(result) {
+            // Handle server response (see Step 4)
+            result.json().then(function(json) {
+              handleServerResponse(json);
+            })
+          });
         }
-        card_state.card_holder = card_holder_state;
-        display_errors();
-      });
+      }
 
       var form = $('#payment-form');
       form.on('submit', function(event) {
+        // We don't want to let default form submission happen here,
+        // which would refresh the page.
         event.preventDefault();
-        if (!card_complete()) {
-          error_elem.empty();
-          error_elem.append($("<div />").text('Please completely fill out form'));
-          error_elem.show();
-          return;
-        }
-        cart_data = {
-          name: card_holder.val().trim()
-        };
-        stripe.createToken(card_number, cart_data).then(function(result) {
-          if (result.error) {
-            error_elem.empty();
-            error_elem.append($("<div />").text(result.error.message));
-            error_elem.show();
-          } else {
-            error_elem.hide();
-            var form = $('#payment-form');
 
-            var uid = $("<input />");
-            uid.attr('type', 'hidden');
-            uid.attr('name', 'uid');
-            uid.attr('value', order_uid);
-            form.append(uid);
-
-            var token_id = $("<input />");
-            token_id.attr('type', 'hidden');
-            token_id.attr('name', 'stripeToken');
-            token_id.attr('value', result.token.id);
-            form.append(token_id);
-
-            form.get(0).submit();
-          }
-        });
+        stripe.createPaymentMethod({
+          type: 'card',
+          card: cardElement,
+          billing_details: {
+            // Include any additional collected billing details.
+            name: order_uid,
+          },
+        }).then(stripePaymentMethodHandler);
       });
+
+      function handleServerResponse(response) {
+        if (response.error) {
+          window.location = './@@stripe_payment_failed?message=' + response.error;
+        } else if (response.requiresAction) {
+          // Use Stripe.js to handle required card action
+          stripe.handleCardAction(
+            response.clientSecret
+          ).then(handleStripeJsResult);
+        } else {
+          window.location = './@@stripe_payment_success';
+        }
+      }
+
+      function handleStripeJsResult(result) {
+        if (result.error) {
+          // Show error in payment form
+        } else {
+          // The card action has been handled
+          // The PaymentIntent can be confirmed again on the server
+          fetch('./stripe_charge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              payment_intent_id: result.paymentIntent.id,
+              order_uid: order_uid
+            })
+          }).then(function(confirmResult) {
+            return confirmResult.json();
+          }).then(handleServerResponse);
+        }
+      }
+
+    };
     </script>
 
   </tal:main-macro>
